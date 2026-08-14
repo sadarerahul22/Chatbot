@@ -1,3 +1,4 @@
+// Updated: CORS fix deployed on backend
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
