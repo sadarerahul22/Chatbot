@@ -1,3 +1,4 @@
+# Chitti Backend - CORS configured for Netlify deployment
 import os
 import logging
 import httpx
