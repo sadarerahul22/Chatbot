@@ -15,15 +15,20 @@ load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 
+# ✅ UPDATED CORS - Allow Netlify and localhost
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",  # Local development
+        "https://thunderous-strudel-5f10e4.netlify.app",  # Your Netlify URL
+        "https://*.netlify.app",  # Allow all Netlify sites (optional)
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
-# Read from .env – now using Groq
+# Read from .env – using Groq
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
