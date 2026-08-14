@@ -1,4 +1,4 @@
-# Chitti Backend - CORS configured for Netlify deployment
+# Chitti Backend - Fixed CORS
 import os
 import logging
 import httpx
@@ -16,17 +16,18 @@ load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 
-# ✅ UPDATED CORS - Allow Netlify and localhost
+# ✅ FIXED CORS - Allow Netlify with explicit methods
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Local development
-        "https://thunderous-strudel-5f10e4.netlify.app",  # Your Netlify URL
-        "https://*.netlify.app",  # Allow all Netlify sites (optional)
+        "http://localhost:5173",
+        "https://thunderous-strudel-5f10e4.netlify.app",
+        "https://*.netlify.app",
+        "https://chatbot-1-62h4.onrender.com",
     ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Read from .env – using Groq
@@ -39,12 +40,21 @@ if GROQ_API_KEY:
 else:
     logger.error("❌ GROQ_API_KEY not found in environment!")
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Chitti Backend is running!"}
+
 @app.get("/test-key")
 async def test_key():
     if GROQ_API_KEY:
         return {"status": "ok", "key_prefix": GROQ_API_KEY[:8] + "..."}
     else:
         return {"status": "error", "message": "GROQ_API_KEY not set"}
+
+@app.options("/chat")
+async def options_chat():
+    """Handle preflight OPTIONS request"""
+    return {"message": "OK"}
 
 class ChatRequest(BaseModel):
     message: str
@@ -90,7 +100,3 @@ async def chat(request: ChatRequest):
         except Exception as e:
             logger.error("Unexpected error: %s", str(e))
             raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/")
-async def root():
-    return {"status": "ok"}
