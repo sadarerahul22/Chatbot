@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Use environment variable for API URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -40,7 +43,7 @@ const Chat = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/chat', {
+      const response = await axios.post(`${API_URL}/chat`, {
         message: input,
       });
       const botMsg = { role: 'bot', content: response.data.reply };
